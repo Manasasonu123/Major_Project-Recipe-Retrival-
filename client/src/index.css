@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+body {
+  /* background-color: #f9dcc5; Use any color */
+  background-image: url('/images/bgc4.jpeg');
+  margin: 0;
+  background-position: center;
+  background-size: cover;
+  background-attachment:fixed;
+}
+.login-background,
+.signup-background {
+  background-image: url('/images/logRegBg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+html {
+  scroll-behavior: smooth;
+}
