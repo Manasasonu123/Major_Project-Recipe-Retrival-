@@ -10,6 +10,7 @@ import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "../context/userContext";
 import NamePrediction from "./Pages/NamePrediction";
+import RecipePredict from "./Pages/RecipePredict";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -25,6 +26,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/namepredict" element={<NamePrediction />} />
+          <Route path="/recipepredict" element={<RecipePredict />} />
         </Routes>
       </BrowserRouter>
     </UserContextProvider>

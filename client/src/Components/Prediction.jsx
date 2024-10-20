@@ -26,7 +26,7 @@ function Prediction() {
           <h1 className="text-3xl text-white font-bold my-12">
             Want to find the recipe of Food?
           </h1>
-          <Link to="/">
+          <Link to="/recipepredict">
             <button className="bg-red-500 text-white h-[50px] px-4 rounded-lg hover:bg-red-600 transition duration-300">
               Generate Recipe
             </button>
