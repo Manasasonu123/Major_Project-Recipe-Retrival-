@@ -13,14 +13,9 @@ function RecipePredict() {
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-
-    // Set the image preview URL
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview(null);
-    }
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (event) => {
@@ -82,13 +77,12 @@ function RecipePredict() {
         </div>
 
         {/* Display image preview */}
-        {imagePreview && (
-          <div className="mb-4">
-            <h3 className="text-gray-700 text-sm font-bold mb-2">Preview:</h3>
+        {imagePreview && ( // Display the selected image
+          <div className="mb-4 flex justify-center">
             <img
               src={imagePreview}
-              alt="Uploaded Preview"
-              className="w-full h-auto rounded-xl shadow-md"
+              alt="Selected Food"
+              className="w-50 h-auto rounded-md"
             />
           </div>
         )}

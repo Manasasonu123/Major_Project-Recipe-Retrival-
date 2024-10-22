@@ -6,11 +6,14 @@ function FoodNameGeneration() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [predictedLabel, setPredictedLabel] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (event) => {
@@ -68,6 +71,16 @@ function FoodNameGeneration() {
             required
           />
         </div>
+        
+        {imagePreview && ( // Display the selected image
+          <div className="mb-4 flex justify-center">
+            <img
+              src={imagePreview}
+              alt="Selected Food"
+              className="w-50 h-auto rounded-md"
+            />
+          </div>
+        )}
         <button
           type="submit"
           className={`bg-red-600 text-white py-2 px-4 rounded-xl hover:bg-red-700 focus:outline-none focus:shadow-outline ${
