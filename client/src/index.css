@@ -31,7 +31,8 @@ html {
   padding: 15px;
   border-radius: 15px;
   /* background-color: rgb(250, 224, 158); */
-  border: 1px solid gray;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .Dropdow::before{
@@ -45,4 +46,6 @@ html {
   background-color: white;
   border-left:1px solid gray;
   border-top:1px solid gray;
+  cursor: pointer;
 }
+

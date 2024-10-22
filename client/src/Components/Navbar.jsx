@@ -63,24 +63,37 @@
 import React, { useState } from "react";
 import { Link } from "react-scroll";
 import Dropdown from "./Dropdown";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const navigate=useNavigate();
 
   const toggleDropdown = () => {
     setOpen((prev) => !prev); // Toggle dropdown state
   };
+  
+  const handleHomeClick = () => {
+    navigate("/dashboard"); // Navigate to the dashboard on click
+  };
+
 
   return (
     <div className="fixed top-0 left-0 w-full flex border space-x-8 items-center pl-3 py-5 bg-transparent shadow-md z-50">
-      <Link
+      {/* <Link
         to="banner"
         smooth={true}
         duration={500}
         className="cursor-pointer font-bold"
       >
         Home
-      </Link>
+      </Link> */}
+      <button
+        onClick={handleHomeClick} // Use onClick to handle navigation
+        className="cursor-pointer font-bold"
+      >
+        Home
+      </button>
       <Link
         to="about"
         smooth={true}

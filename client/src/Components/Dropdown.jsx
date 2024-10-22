@@ -7,7 +7,7 @@ const Dropdown = () => {
     <div className='flex flex-col Dropdown'>
         <ul className='flex flex-col gap-4'>
             <li onClick={() => navigate("/dashboard/indian")}>Indian Food</li>
-            <li onClick={() => navigate("/dashboard/nonindian")}>Non-ndian Food</li>
+            <li onClick={() => navigate("/dashboard/nonindian")}>Non-Indian Food</li>
         </ul>
     </div>
   )
