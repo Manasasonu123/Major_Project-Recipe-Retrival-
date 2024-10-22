@@ -1,2 +1,6 @@
 node_modules/
 .env
+recipe_embds205.txt
+training_names.txt
+vgg16_modelfeatures.h5
+model.h5
