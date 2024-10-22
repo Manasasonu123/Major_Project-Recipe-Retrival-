@@ -53,7 +53,7 @@ function RecipePredict() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-4xl font-bold mb-8">Food Recipie Generator</h1>
       <form
         onSubmit={handleSubmit}
