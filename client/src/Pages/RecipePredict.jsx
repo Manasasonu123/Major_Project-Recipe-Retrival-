@@ -138,7 +138,7 @@ function RecipePredict() {
           {recipe_details.method && (
             <div>
               <h3 className="font-bold mt-2">Method:</h3>
-              <ol className="list-decimal list-inside">
+              <ol>
                 {recipe_details.method.map((step, index) => (
                   <li key={index}>{step}</li>
                 ))}
