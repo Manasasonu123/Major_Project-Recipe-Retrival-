@@ -6,8 +6,8 @@ import About from "../Components/About";
 import Prediction from "../Components/Prediction";
 import { useContext } from "react";
 import { userContext } from "../../context/userContext";
-import Indian from "./Indian";
-import NonIndian from "./Non-Indian";
+import IndianRecipe from "./IndianRecipe";
+import NonIndianRecipe from "./NonIndianRecipe";
 
 function Dashboard() {
   const { user } = useContext(userContext);
@@ -32,8 +32,8 @@ function Dashboard() {
               </>
             }
           />
-          <Route path="/indian" element={<Indian />} />
-          <Route path="/nonindian" element={<NonIndian />} />
+          <Route path="/indian/*" element={<IndianRecipe />} />
+          <Route path="/nonindian" element={<NonIndianRecipe />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </div>

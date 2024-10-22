@@ -25,8 +25,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
-          <Route path="/namepredict" element={<NamePrediction />} />
           <Route path="/recipepredict" element={<RecipePredict />} />
+          <Route path="/namepredict" element={<NamePrediction />} />
         </Routes>
       </BrowserRouter>
     </UserContextProvider>

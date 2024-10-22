@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function RecipePredict() {
+function NonIndianRecipe() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [predictedLabel, setPredictedLabel] = useState("");
   const [recipeUrl, setRecipeUrl] = useState("");
   const [recipe_details, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
-  const [relatedFoods, setRelatedFoods] = useState([]);
 
   const navigate = useNavigate();
 
@@ -34,7 +33,7 @@ function RecipePredict() {
 
     try {
       // Make the POST request to the Flask API
-      const response = await fetch("http://localhost:5000/predict-and-scrape", {
+      const response = await fetch("http://localhost:5000/predict-and-scrape-nonindian", {
         method: "POST",
         body: formData,
       });
@@ -46,7 +45,6 @@ function RecipePredict() {
       setPredictedLabel(result.predicted_label);
       setRecipeUrl(result.recipe_url);
       setInstructions(result.recipe_details);
-      setRelatedFoods(result.related_foods);
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
@@ -56,7 +54,7 @@ function RecipePredict() {
 
   return (
     <div className="flex flex-col items-center justify-center h-min-screen">
-      <h1 className="text-4xl font-bold mb-8">Food Recipie Generator</h1>
+      <h1 className="text-4xl font-bold mb-8">Non-Indian Food Recipie Generator</h1>
       <form
         onSubmit={handleSubmit}
         className="bg-red-500 bg-opacity-70 p-6 rounded-3xl shadow-md w-full max-w-md"
@@ -150,22 +148,6 @@ function RecipePredict() {
         </div>
       )}
 
-      {predictedLabel && (
-        <div>
-          <h2>Predicted Food: {predictedLabel}</h2>
-          {relatedFoods.length > 0 && (
-            <div>
-              <h3>Related Foods:</h3>
-              <ul>
-                {relatedFoods.map((food, index) => (
-                  <li key={index}>Recipe: {food.recipe_name}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* {recipe_details && (
         <div className="flex flex-col mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
           <h2 className="text-lg font-bold">Instructions:</h2>
@@ -183,4 +165,4 @@ function RecipePredict() {
   );
 }
 
-export default RecipePredict;
+export default NonIndianRecipe;
