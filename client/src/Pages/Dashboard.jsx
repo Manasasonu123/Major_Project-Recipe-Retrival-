@@ -15,11 +15,11 @@ function Dashboard() {
     <>
       <Navbar />
       <div className="pt-16">
-        {/* Greet the user if logged in */}
+        {/* Greet the user if logged in  */}
 
-        {/* {!!user && user.fullName && (
+       {/* {!!user && user.fullName && (
           <h2 className="text-center text-xl mt-4">Hi {user.fullName}!</h2>
-        )} */}
+        )}  */}
         <Routes>
           <Route
             path="/"

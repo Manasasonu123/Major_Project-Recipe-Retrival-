@@ -67,7 +67,8 @@ try{
     // check if password match
     const match = await comparePassword(password, user.password)
     if(match){
-        jwt.sign({userName:user.userName,id:user._id,fullName:user.fullName},process.env.JWT_SECRET,{},(err,token)=>{
+        const predicted_food = user.predicted_food || ''; // Assuming it's part of the user schema
+        jwt.sign({userName:user.userName,id:user._id,fullName:user.fullName,predicted_food},process.env.JWT_SECRET,{},(err,token)=>{
             if(err) throw err;
             res.cookie('token',token).json(user)
         })
@@ -85,9 +86,15 @@ try{
 const getProfile=(req,res)=>{
     const {token} = req.cookies
     if(token){
-        jwt.verify(token,process.env.JWT_SECRET,{},(err,userName)=>{
+        jwt.verify(token,process.env.JWT_SECRET,{},(err,decoded)=>{
             if(err) throw err;
-            res.json(userName)
+            res.json({
+                userName: decoded.userName,
+                id: decoded.id,
+                fullName: decoded.fullName,
+                predicted_food: decoded.predicted_food, // Add this to return it
+                iat: decoded.iat
+            });
         })
     } else{
         res.json(null)
