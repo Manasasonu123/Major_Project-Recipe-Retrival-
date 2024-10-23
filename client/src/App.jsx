@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "../context/userContext";
 import NamePrediction from "./Pages/NamePrediction";
 import RecipePredict from "./Pages/RecipePredict";
+import History from "./Pages/History"
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -27,6 +28,8 @@ function App() {
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/recipepredict" element={<RecipePredict />} />
           <Route path="/namepredict" element={<NamePrediction />} />
+          <Route path="/history" element={<History />}/> 
+          
         </Routes>
       </BrowserRouter>
     </UserContextProvider>
