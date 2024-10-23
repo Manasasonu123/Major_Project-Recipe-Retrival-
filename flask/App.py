@@ -766,12 +766,13 @@ class_labels = [
 
 def preprocess_image(image):
     try:
-        image = image.resize((224, 224))  # Resize to match the input size of the model
-        image = np.array(image) / 255.0   # Normalize pixel values
+        image = image.resize((224, 224))
+        image = np.array(image) / 255.0
         return np.expand_dims(image, axis=0)
     except Exception as e:
-        logger.error(f"Error in preprocessing image: {e}")
+        logger.error(f"Error resizing or normalizing image: {e}")
         return None
+
 
 # Web scraping function to search for a recipe on Hebbar's Kitchen website
 def search_recipe(food_name):
@@ -872,8 +873,124 @@ def get_related_food_names(image):
             break
     return unique_top_recipes
 
+# Function to search and scrape images for similar recipes
+def get_image_for_related_food(recipe_name):
+    search_url = f"https://www.google.com/search?q={recipe_name.replace(' ', '+')}+recipe&tbm=isch"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    try:
+        response = requests.get(search_url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred while searching for {recipe_name}: {err}")
+        return None
+    except Exception as e:
+        print(f"An error occurred while searching for {recipe_name}: {e}")
+        return None
+
+    # Parse the HTML response
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Find the first image in the search results
+    image_tags = soup.find_all('img')
+
+    if image_tags:
+        image_url = image_tags[1]['src']  # Skip the first image as it may be the Google logo
+        return image_url
+    else:
+        print(f"No images found for {recipe_name}.")
+        return None
 
 # Route for predicting and scraping recipes
+@app.route('/predict-and-scrape', methods=['POST'])
+# def predict_and_scrape():
+#     if 'image' not in request.files:
+#         logger.warning("No image part in the request.")
+#         return jsonify({'error': 'No image provided.'}), 400
+
+#     file = request.files['image']
+
+#     if file.filename == '':
+#         logger.warning("No selected file.")
+#         return jsonify({'error': 'No selected image.'}), 400
+
+#     try:
+#         image = Image.open(file).convert('RGB')
+#     except Exception as e:
+#         logger.error(f"Error opening image: {e}")
+#         return jsonify({'error': 'Invalid image file.'}), 400
+
+#     processed_image = preprocess_image(image)
+#     if processed_image is None:
+#         return jsonify({'error': 'Error processing image.'}), 500
+
+#     try:
+#         # Predict the class of the image
+#         prediction = food_model.predict(processed_image)
+#         predicted_class = np.argmax(prediction, axis=-1)[0]
+
+#         if predicted_class >= len(class_labels):
+#             logger.error(f"Predicted class index {predicted_class} out of range.")
+#             return jsonify({'error': 'Prediction out of range.'}), 500
+
+#         predicted_label = class_labels[predicted_class - 1]
+#         logger.info(f"Predicted label: {predicted_label}")
+
+#         # Perform web scraping using the predicted label
+#         recipe_url = search_recipe(predicted_label)
+
+#         if recipe_url:
+#             # Call the function to scrape the specific recipe
+#             recipe_details = scrape_recipe(recipe_url)
+
+#             # return jsonify({
+#             #     'predicted_class': int(predicted_class),
+#             #     'predicted_label': predicted_label,
+#             #     'recipe_url': recipe_url,
+#             #     'recipe_details': recipe_details
+#             # })
+#         else:
+#             recipe_details = {'recipe_url': 'No recipe found.'}
+#             # return jsonify({
+#             #     'predicted_class': int(predicted_class),
+#             #     'predicted_label': predicted_label,
+#             #     'recipe_url': 'No recipe found.'
+#             # })
+        
+#         # Get related food names with similarity scores
+#         related_foods = get_related_food_names(image)
+
+#         # Prepare response with the related food names and their similarity scores
+#         if related_foods:
+#             related_food_list = [{'recipe_name': recipe} for recipe in related_foods]
+#         else:
+#             related_food_list = []
+        
+#         recipe_images={}
+
+#         for recipe in related_foods:
+#             image_url = get_image_for_related_food(recipe)
+#             if image_url:
+#                 recipe_images[recipe] = image_url
+
+#         return jsonify({
+#             'predicted_class': int(predicted_class),
+#             'recipe_url': recipe_url,
+#             'predicted_label': predicted_label,
+#             'recipe_details': recipe_details,
+#             'related_foods': related_food_list,
+#             #'food_url': recipe_images
+#         })
+
+        
+        
+#     except Exception as e:
+#         logger.error(f"Error during prediction and scraping: {e}")
+#         return jsonify({'error': 'Prediction and scraping failed.'}), 500
+
 @app.route('/predict-and-scrape', methods=['POST'])
 def predict_and_scrape():
     if 'image' not in request.files:
@@ -901,55 +1018,50 @@ def predict_and_scrape():
         prediction = food_model.predict(processed_image)
         predicted_class = np.argmax(prediction, axis=-1)[0]
 
-        if predicted_class >= len(class_labels):
-            logger.error(f"Predicted class index {predicted_class} out of range.")
+        if len(prediction) == 0 or predicted_class >= len(class_labels):
+            logger.error("Prediction failed or class index out of range")
             return jsonify({'error': 'Prediction out of range.'}), 500
 
-        predicted_label = class_labels[predicted_class - 1]
+
+        # Use predicted_class directly without subtracting 1
+        predicted_label = class_labels[predicted_class]
         logger.info(f"Predicted label: {predicted_label}")
 
         # Perform web scraping using the predicted label
         recipe_url = search_recipe(predicted_label)
 
         if recipe_url:
-            # Call the function to scrape the specific recipe
             recipe_details = scrape_recipe(recipe_url)
-
-            # return jsonify({
-            #     'predicted_class': int(predicted_class),
-            #     'predicted_label': predicted_label,
-            #     'recipe_url': recipe_url,
-            #     'recipe_details': recipe_details
-            # })
         else:
             recipe_details = {'recipe_url': 'No recipe found.'}
-            # return jsonify({
-            #     'predicted_class': int(predicted_class),
-            #     'predicted_label': predicted_label,
-            #     'recipe_url': 'No recipe found.'
-            # })
-        
+
         # Get related food names with similarity scores
         related_foods = get_related_food_names(image)
 
-        # Prepare response with the related food names and their similarity scores
-        if related_foods:
-            related_food_list = [{'recipe_name': recipe} for recipe in related_foods]
-        else:
-            related_food_list = []
+        related_food_list = [{'recipe_name': recipe} for recipe in related_foods] if related_foods else []
 
+        # Get images for related foods
+        recipe_images = {}
+        for recipe in related_foods:
+            image_url = get_image_for_related_food(recipe)
+            if image_url:
+                recipe_images[recipe] = image_url
+
+        # Return the full JSON response
+        print(recipe_images)
         return jsonify({
             'predicted_class': int(predicted_class),
             'recipe_url': recipe_url,
             'predicted_label': predicted_label,
             'recipe_details': recipe_details,
-            'related_foods': related_food_list
+            'related_foods': related_food_list,
+            'related_food_images': recipe_images
         })
         
-        
     except Exception as e:
-        logger.error(f"Error during prediction and scraping: {e}")
-        return jsonify({'error': 'Prediction and scraping failed.'}), 500
+        logger.error(f"Error during prediction or web scraping: {e}")
+        return jsonify({'error': 'An error occurred during processing.'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

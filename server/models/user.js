@@ -8,7 +8,11 @@ const userSchema = new Schema({
         type:String,
         unique:true
     },
-    password:String
+    password:String,
+    predicted_food: {
+        type: [String], // Array of strings to store predicted food labels
+        default: [],    // Initialize as an empty array
+      },
 })
 
 const UserModel = mongoose.model('User',userSchema);
