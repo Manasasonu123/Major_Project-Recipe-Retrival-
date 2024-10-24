@@ -199,7 +199,7 @@ function RecipePredict() {
           )}
         </div>
       )}
-      
+
       {predictedLabel && (
         <div>
           <h2>Predicted Food: {predictedLabel}</h2>
@@ -208,9 +208,7 @@ function RecipePredict() {
               <h3>Related Foods:</h3>
               <ul>
                 {relatedFoods.map((food, index) => (
-                  <li key={index}>
-                    Recipe: {food.recipe_name}
-                  </li>
+                  <li key={index}>Recipe: {food.recipe_name}</li>
                 ))}
               </ul>
             </div>

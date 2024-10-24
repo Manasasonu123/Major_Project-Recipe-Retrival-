@@ -43,7 +43,7 @@
 
 //           )
 //         }
-        
+
 //       </Link>
 
 //       <Link
@@ -67,20 +67,19 @@ import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setOpen((prev) => !prev); // Toggle dropdown state
   };
-  
+
   const handleHomeClick = () => {
     navigate("/dashboard"); // Navigate to the dashboard on click
   };
 
-  const handleHistoryClick=()=>{
+  const handleHistoryClick = () => {
     navigate("/history");
-  }
-
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full flex border space-x-8 items-center pl-3 py-5 bg-transparent shadow-md z-50">
@@ -137,4 +136,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

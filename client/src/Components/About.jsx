@@ -7,7 +7,7 @@ function About() {
     1: "Step 1: Upload a food image. This is the first step to predict the recipe, where you upload an image of the dish.",
     2: "Step 2: Image recognition is applied to analyze the uploaded food image and identify the ingredients.",
     3: "Step 3: Recipe prediction uses machine learning to predict possible recipes based on the recognized ingredients.",
-    4: "Step 4: View the recipe, including ingredients and step-by-step cooking instructions.",
+    4: "Step 4: View the recipe, including ingredients, step-by-step cooking instructions and also related recipe which is specially done by the vgg16 model.",
   };
 
   return (
