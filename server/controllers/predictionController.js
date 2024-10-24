@@ -37,4 +37,25 @@ const addPrediction = async (req, res) => {
     }
 };
 
-module.exports = { addPrediction };
+const showPrediction = async (req, res) => {
+    const { userId } = req.query; // Extract userId from query parameters, not body
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID required.' });
+    }
+
+    try {
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const food = user.predicted_food;
+        return res.status(200).json({ message: 'Success', predicted_food: food });
+    } catch (error) {
+        console.error('Error displaying foods', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+module.exports = { addPrediction,showPrediction };

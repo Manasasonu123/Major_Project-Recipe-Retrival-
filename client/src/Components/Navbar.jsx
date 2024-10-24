@@ -77,6 +77,10 @@ function Navbar() {
     navigate("/dashboard"); // Navigate to the dashboard on click
   };
 
+  const handleHistoryClick = () => {
+    navigate("/history");
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full flex border space-x-8 items-center pl-3 py-5 bg-transparent shadow-md z-50">
       {/* <Link
@@ -121,24 +125,12 @@ function Navbar() {
         {open && <Dropdown />} {/* Conditionally render Dropdown */}
       </div>
 
-      <Link
-        to="#"
-        smooth={true}
-        duration={500}
+      <button
+        onClick={handleHistoryClick} // Use onClick to handle navigation
         className="cursor-pointer font-bold"
       >
         History
-      </Link>
-      <div className="ml-auto">
-        <Link
-          to="#"
-          smooth={true}
-          duration={500}
-          className="bg-red-500 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-red-600"
-        >
-          Logout
-        </Link>
-      </div>
+      </button>
     </div>
   );
 }
