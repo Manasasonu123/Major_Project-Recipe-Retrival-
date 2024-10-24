@@ -53,7 +53,7 @@ function RecipePredict() {
       setRelatedFoods(result.related_foods);
 
        // Save the prediction to the backend with userId
-       savePrediction(result.predicted_label, user.id); // Use user._id from UserContext
+       savePrediction(result.predicted_label, result.recipe_details, user.id);
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
@@ -61,27 +61,40 @@ function RecipePredict() {
     }
   };
 
-   // Function to save prediction to Node.js backend
-   const savePrediction = async (predictedLabel, userId) => {
+  const savePrediction = async (predictedLabel, recipeDetails, userId) => {
     try {
+      // 
+      const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
       const response = await fetch('http://localhost:8000/users/add-prediction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId, predictedLabel }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          food_name: predictedLabel, // Corrected: Changed to food_name
+          recipe: combinedRecipe, // Corrected: Changed to recipe
+        }),
       });
-
+      console.log(response);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
       const result = await response.json();
       if (result.error) {
         console.error(result.error);
       } else {
-        console.log('Prediction saved:', result.predicted_food);
+        console.log('Prediction saved:', result.predicted_value);
       }
     } catch (error) {
       console.error('Error saving prediction:', error);
     }
   };
+  
+  
+  
 
 
 

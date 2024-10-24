@@ -1,20 +1,41 @@
-const mongoose = require('mongoose')
-const {Schema} = mongoose
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const userSchema = new Schema({
-    fullName:String,
-    userName:String,
-    email:{
-        type:String,
-        unique:true
+// Schema for predicted food items
+const predictedFoodSchema = new Schema({
+    food_name: {
+        type: String,
+        required: true
     },
-    password:String,
-    predicted_food: {
-        type: [String], // Array of strings to store predicted food labels
-        default: [],    // Initialize as an empty array
-      },
-})
+    recipe: {
+        type: String,
+        required: true
+    }
+});
 
-const UserModel = mongoose.model('User',userSchema);
+// User schema
+const userSchema = new Schema({
+    fullName: {
+        type: String,
+        required: true
+    },
+    userName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    predicted_value: [predictedFoodSchema] // Array of predicted food objects
+});
+
+// Create the User model
+const UserModel = mongoose.model('User', userSchema);
 
 module.exports = UserModel;
