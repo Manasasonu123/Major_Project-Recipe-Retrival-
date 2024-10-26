@@ -240,6 +240,7 @@ with open('training_names.txt', 'r') as f:
 
 # Define dataset and model parameters
 img_width, img_height = 200, 200
+n_classes =123 
 
 
 def load_inception_model():
@@ -261,6 +262,24 @@ def load_inception_model():
     
     return model
 
+def load_indian_model():
+    # Load and modify the InceptionV3 model as used during training
+    inception = InceptionV3(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))
+    layer = inception.output
+    layer = GlobalAveragePooling2D()(layer)
+    layer = Dense(128, activation='relu')(layer)
+    layer = Dropout(0.3)(layer)
+
+    # Output layer for 205 classes
+    predictions = Dense(n_classes, kernel_regularizer=regularizers.l2(0.005), activation='softmax')(layer)
+
+    # Create the model
+    model = Model(inputs=inception.input, outputs=predictions)
+
+    # Load the best weights from the checkpoint (update the path if necessary)
+    model.load_weights('best_weights_122_Indian_attempt1class.weights.h5')
+
+    return model
 
 def preprocess_image(image):
     try:
@@ -465,8 +484,6 @@ def predict():
         return jsonify({'error': 'Prediction failed.'}), 500
 
 
-
-
 # Route for predicting and scraping recipes
 @app.route('/predict-and-scrape', methods=['POST'])
 def predict_and_scrape():
@@ -547,11 +564,96 @@ def predict_and_scrape():
     except Exception as e:
         logger.error(f"Error during prediction and scraping: {e}")
         return jsonify({'error': 'Prediction and scraping failed.'}), 500
+    
+
+# Route for predicting and scraping INDIAN recipes
+@app.route('/predict-indian-and-scrape', methods=['POST'])
+def predict_and_scrape_indian():
+
+    #
+    model = models['indian_food']
+
+    if 'image' not in request.files:
+        logger.warning("No image part in the request.")
+        return jsonify({'error': 'No image provided.'}), 400
+    
+    file = request.files['image']
+
+    if file.filename == '':
+        logger.warning("No selected file.")
+        return jsonify({'error': 'No selected image.'}), 400
+    
+    try:
+        image = Image.open(file).convert('RGB')
+        image = image.resize((img_width, img_height))  # Resize the image to match input shape
+        image_array = np.array(image) / 255.0  # Normalize image
+        image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        return jsonify({'error': 'Invalid image file.'}), 400
+    
+    processed_image = preprocess_image(image)
+    if processed_image is None:
+        return jsonify({'error': 'Error processing image.'}), 500
+    
+    try:
+        # Predict the class of the image
+        prediction = model.predict(processed_image)
+        predicted_class = np.argmax(prediction, axis=-1)[0]
+        predicted_label = class_names.get(predicted_class, "Unknown class")
+        logger.info(f"Predicted label: {predicted_label}")
+
+        # Perform web scraping using the predicted label
+        recipe_url = search_recipe(predicted_label)
+
+        if recipe_url:
+            # Call the function to scrape the specific recipe
+            recipe_details = scrape_recipe(recipe_url)
+
+            # return jsonify({
+            #     'predicted_class': int(predicted_class),
+            #     'predicted_label': predicted_label,
+            #     'recipe_url': recipe_url,
+            #     'recipe_details': recipe_details
+            # })
+        else:
+            recipe_details = {'recipe_url': 'No recipe found.'}
+            # return jsonify({
+            #     'predicted_class': int(predicted_class),
+            #     'predicted_label': predicted_label,
+            #     'recipe_url': 'No recipe found.'
+            # })
+
+        # Get related food names with similarity scores
+        related_foods = get_related_food_names(image)
+
+        # Prepare response with the related food names and their similarity scores
+        if related_foods:
+            related_food_list = [{'recipe_name': recipe} for recipe in related_foods]
+        else:
+            related_food_list = []
+        
+        related_food_urls = check_image(related_foods)
+        logger.info(f"predicted path: {related_food_urls}")
+
+        return jsonify({
+            'predicted_class': int(predicted_class),
+            'recipe_url': recipe_url,
+            'predicted_label': predicted_label,
+            'recipe_details': recipe_details,
+            'related_foods': related_food_list,
+            'related_food_urls':related_food_urls
+        })
+    except Exception as e:
+        logger.error(f"Error during prediction and scraping: {e}")
+        return jsonify({'error': 'Prediction and scraping failed.'}), 500
+    
+
 
 if __name__ == '__main__':
     # Load models once when the app starts
     models['inception'] = load_inception_model()
     models['related_food'] = load_model('vgg16_modelfeatures.h5', compile=False)
+    models['indian_food'] = load_indian_model()
     app.run(debug=True)
-
 
