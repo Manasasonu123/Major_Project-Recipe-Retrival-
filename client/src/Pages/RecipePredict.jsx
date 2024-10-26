@@ -32,6 +32,11 @@ function RecipePredict() {
       return;
     }
 
+    if (!user || !user.id) {
+      alert("User is not logged in");
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -60,7 +65,7 @@ function RecipePredict() {
       }, [predictedLabel]);
 
       // Save the prediction to the backend with userId
-      savePrediction(result.predicted_label, user.id); // Use user._id from UserContext
+      savePrediction(result.predicted_label, result.recipe_details, user.id); // Use user._id from UserContext
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
@@ -68,9 +73,10 @@ function RecipePredict() {
     }
   };
 
-  // Function to save prediction to Node.js backend
-  const savePrediction = async (predictedLabel, userId) => {
+  const savePrediction = async (predictedLabel, recipeDetails, userId) => {
     try {
+      //
+      const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
       const response = await fetch(
         "http://localhost:8000/users/add-prediction",
         {
@@ -78,20 +84,30 @@ function RecipePredict() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId, predictedLabel }),
+          body: JSON.stringify({
+            userId,
+            food_name: predictedLabel, // Corrected: Changed to food_name
+            recipe: combinedRecipe, // Corrected: Changed to recipe
+          }),
         }
       );
+      console.log(response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const result = await response.json();
       if (result.error) {
         console.error(result.error);
       } else {
-        console.log("Prediction saved:", result.predicted_food);
+        console.log("Prediction saved:", result.predicted_value);
       }
     } catch (error) {
       console.error("Error saving prediction:", error);
     }
   };
+
   // Function to get the image path for related foods
   const getImagePath = (foodName) => {
     return `/images/${foodName}.jpeg`; // Adjust as needed for .jpeg or other formats
@@ -274,124 +290,3 @@ function RecipePredict() {
 }
 
 export default RecipePredict;
-
-// import React, { useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-
-// function RecipePredict() {
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [predictedLabel, setPredictedLabel] = useState("");
-//   const [recipeUrl, setRecipeUrl] = useState("");
-//   const [recipeDetails, setRecipeDetails] = useState({});
-//   const [relatedFoods, setRelatedFoods] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [imagePreview, setImagePreview] = useState(null);
-
-//   const handleFileChange = (event) => {
-//     const file = event.target.files[0];
-//     setSelectedFile(file);
-//     setImagePreview(URL.createObjectURL(file));
-//   };
-
-//   const handleSubmit = async (event) => {
-//     event.preventDefault();
-
-//     if (!selectedFile) {
-//       alert("Please upload an image.");
-//       return;
-//     }
-
-//     setLoading(true);
-//     setError(null);
-//     setPredictedLabel("");
-//     setRecipeUrl("");
-//     setRecipeDetails({});
-//     setRelatedFoods([]);
-
-//     const formData = new FormData();
-//     formData.append("image", selectedFile);
-
-//     try {
-//       const response = await axios.post("http://localhost:5000/predict-and-scrape", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-
-//       const { predicted_label, recipe_url, recipe_details, related_foods } = response.data;
-
-//       setPredictedLabel(predicted_label);
-//       setRecipeUrl(recipe_url);
-//       setRecipeDetails(recipe_details);
-//       setRelatedFoods(related_foods);
-//     } catch (error) {
-//       setError("Error in prediction or fetching recipe details.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h2>Food Prediction and Recipe Finder</h2>
-//       <form onSubmit={handleSubmit}>
-//         <input type="file" onChange={handleFileChange} accept="image/*" />
-//         {imagePreview && <img src={imagePreview} alt="Preview" style={{ width: "200px", marginTop: "10px" }} />}
-//         <button type="submit" disabled={loading}>
-//           {loading ? "Predicting..." : "Submit"}
-//         </button>
-//       </form>
-
-//       {error && <p style={{ color: "red" }}>{error}</p>}
-
-//       {predictedLabel && (
-//         <div>
-//           <h3>Predicted Food: {predictedLabel}</h3>
-//           {recipeUrl && (
-//             <p>
-//               Recipe URL: <a href={recipeUrl} target="_blank" rel="noopener noreferrer">{recipeUrl}</a>
-//             </p>
-//           )}
-//           {recipeDetails.ingredients && (
-//             <div>
-//               <h4>Ingredients:</h4>
-//               <ul>
-//                 {recipeDetails.ingredients.map((ingredient, index) => (
-//                   <li key={index}>{ingredient}</li>
-//                 ))}
-//               </ul>
-//             </div>
-//           )}
-//           {recipeDetails.method && (
-//             <div>
-//               <h4>Method:</h4>
-//               <ol>
-//                 {recipeDetails.method.map((step, index) => (
-//                   <li key={index}>{step}</li>
-//                 ))}
-//               </ol>
-//             </div>
-//           )}
-//         </div>
-//       )}
-
-//       {relatedFoods.length > 0 && (
-//         <div>
-//           <h3>Related Foods:</h3>
-//           <ul>
-//             {relatedFoods.map((food, index) => (
-//               <li key={index}>
-//                 <p>{food.recipe_name}</p>
-//                 {food.image_url && <img src={food.image_url} alt={food.recipe_name} style={{ width: "100px" }} />}
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default RecipePredict;

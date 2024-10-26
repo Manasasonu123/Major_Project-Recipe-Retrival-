@@ -81,16 +81,16 @@ function Navbar() {
     navigate("/history");
   };
 
+  const handleLogoutClick = () => {
+    // Remove the token from local storage or session storage
+    localStorage.removeItem('token'); // or sessionStorage.removeItem('token');
+
+    // Redirect to the login page or home page
+    navigate('/login'); // Use navigate instead of history.push
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full flex border space-x-8 items-center pl-3 py-5 bg-transparent shadow-md z-50">
-      {/* <Link
-        to="banner"
-        smooth={true}
-        duration={500}
-        className="cursor-pointer font-bold"
-      >
-        Home
-      </Link> */}
       <button
         onClick={handleHomeClick} // Use onClick to handle navigation
         className="cursor-pointer font-bold"
@@ -124,15 +124,26 @@ function Navbar() {
         </button>
         {open && <Dropdown />} {/* Conditionally render Dropdown */}
       </div>
-
-      <button
-        onClick={handleHistoryClick} // Use onClick to handle navigation
-        className="cursor-pointer font-bold"
-      >
-        History
-      </button>
+      
+      <div className="history">
+        <button
+          onClick={handleHistoryClick} // Use onClick to handle navigation
+          className="cursor-pointer font-bold"
+        >
+          History
+        </button>
+      </div>
+      <div className="logout">
+        <button
+          onClick={handleLogoutClick} // Use onClick to handle navigation
+          className="cursor-pointer font-bold"
+        >
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
 
 export default Navbar;
+

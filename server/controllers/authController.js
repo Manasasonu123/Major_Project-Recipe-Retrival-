@@ -67,8 +67,8 @@ try{
     // check if password match
     const match = await comparePassword(password, user.password)
     if(match){
-        const predicted_food = user.predicted_food || ''; // Assuming it's part of the user schema
-        jwt.sign({userName:user.userName,id:user._id,fullName:user.fullName,predicted_food},process.env.JWT_SECRET,{},(err,token)=>{
+        const predicted_value = user.predicted_value || ''; // Assuming it's part of the user schema
+        jwt.sign({userName:user.userName,id:user._id,fullName:user.fullName,predicted_value},process.env.JWT_SECRET,{},(err,token)=>{
             if(err) throw err;
             res.cookie('token',token).json(user)
         })
@@ -92,7 +92,7 @@ const getProfile=(req,res)=>{
                 userName: decoded.userName,
                 id: decoded.id,
                 fullName: decoded.fullName,
-                predicted_food: decoded.predicted_food, // Add this to return it
+                predicted_value: decoded.predicted_value, // Add this to return it
                 iat: decoded.iat
             });
         })
@@ -101,9 +101,24 @@ const getProfile=(req,res)=>{
     }
 }
 
+const logoutUser = (req, res) => {
+    try {
+        // Clear the JWT token from cookies
+        res.clearCookie('token');
+        
+        // Send a response indicating successful logout
+        return res.json({ message: 'Logout successful' });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error during logout' });
+    }
+};
+
+
 module.exports = {
     test,
     registerUser,
     loginUser,
-    getProfile
+    getProfile,
+    logoutUser // Add this to the exports
 };
