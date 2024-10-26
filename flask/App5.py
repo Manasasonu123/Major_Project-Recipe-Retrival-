@@ -202,10 +202,10 @@ class_names = {
     174: 'sandesh',
     175: 'sashimi',
     176: 'scallops',
-    177: 'seaweed_salad',
+    177: 'seaweed salad',
     178: 'shankarpali',
     179: 'shawarma',
-    180: 'sheer_korma',
+    180: 'sheer korma',
     181: 'sheera',
     182: 'shrikhand',
     183: 'shrimp and grits',
@@ -367,14 +367,47 @@ def get_related_food_names(image):
             unique_top_recipes.append(base_recipe_name)
         if len(unique_top_recipes) >= 5:  # Limit to top 10 related foods
             break
+    logger.info(f"top related recipes: {unique_top_recipes}")
     return unique_top_recipes
+
+def get_recipe_images(recipe_names):
+    images = []
+    for recipe in recipe_names:
+        # Format the recipe name for search
+        query = recipe.replace("_", "+")
+        url = f"https://hebbarskitchen.com/?s={query}"  # Example website
+        
+        # logger.info(f"Scraping URL: {url}")  # Add this print to debug
+
+        try:
+        # Scraping logic
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Assuming images are inside an 'img' tag (you can customize this based on the actual site)
+            img_tag = soup.find('span', class_='entry-thumb td-thumb-css')  # Replace with the specific tag/class from the site you're scraping
+            # logger.info(f"Scraped tag: {img_tag}")
+
+            if img_tag and 'background-image' in img_tag.get('style', ''):
+                # Extracting the URL from the 'background-image' style attribute
+                style_attr = img_tag['style']
+                img_url = style_attr.split('url(')[-1].split(')')[0].strip('"')
+                images.append(img_url)
+                # logger.info(f"Found image URL: {img_url}")
+            else:
+                # If no image found, append a default image URL
+                images.append("https://via.placeholder.com/150")  # Replace with a default placeholder image URL
+        except Exception as e:
+            logger.error(f"Error fetching image for {recipe}: {e}")
+            images.append("https://via.placeholder.com/150")
+    logger.info(f"Final images list: {images}")
+    return images  # Return the list of image URLs
+
 
 # Route for predicting only the food name
 @app.route('/predict', methods=['POST'])
 def predict():
     model = models['inception']
-
-
 
     if 'image' not in request.files:
         logger.warning("No image part in the request.")
@@ -413,7 +446,7 @@ def predict():
         logger.error(f"Error during prediction: {e}")
         return jsonify({'error': 'Prediction failed.'}), 500
 
-# Web scr
+
 
 
 # Route for predicting and scraping recipes
@@ -481,13 +514,22 @@ def predict_and_scrape():
             related_food_list = [{'recipe_name': recipe} for recipe in related_foods]
         else:
             related_food_list = []
+        
+        # logger.info(f"top related recipes: {related_foods}")
 
+        related_photo_url = get_recipe_images(related_foods)
+
+        # logger.info(f"Final images list: {related_photo_url}")
+
+
+        # logger.info(related_photo_url)
         return jsonify({
             'predicted_class': int(predicted_class),
             'recipe_url': recipe_url,
             'predicted_label': predicted_label,
             'recipe_details': recipe_details,
-            'related_foods': related_food_list
+            'related_foods': related_food_list,
+            #'related_photo_url':related_photo_url
         })
     except Exception as e:
         logger.error(f"Error during prediction and scraping: {e}")

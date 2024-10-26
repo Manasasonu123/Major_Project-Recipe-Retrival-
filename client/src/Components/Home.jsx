@@ -21,13 +21,11 @@ function Home() {
       </div>
 
       <div className="absolute inset-0 bg-red bg-opacity-40 flex flex-col justify-center text-center p-8">
-        <h1 className="text-5xl font-bold mb-24">
-          Automated Recipe Retrieval Through Food Image{" "}
-        </h1>
+        <h1 className="text-7xl font-bold mb-12">Snap and Savour </h1>
 
-        {/* <p className="mb-8">
-          Upload a food image to predict ingredients and recipes.
-        </p> */}
+        <p className="mb-24 text-xl">
+          Automated Recipe Retrieval Through Food Image
+        </p>
         <div className="flex justify-center space-x-4">
           <Link
             to="prediction"
@@ -43,7 +41,7 @@ function Home() {
             smooth={true}
             duration={500}
             offset={-64}
-            className="bg-gray-500 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-gray-600"
+            className="bg-green-600 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-green-700"
           >
             Learn More
           </Link>
