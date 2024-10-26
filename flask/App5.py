@@ -366,7 +366,7 @@ def get_related_food_names(image):
         if base_recipe_name not in seen_recipes:
             seen_recipes.add(base_recipe_name)
             unique_top_recipes.append(base_recipe_name)
-        if len(unique_top_recipes) >= 5:  # Limit to top 10 related foods
+        if len(unique_top_recipes) >= 8:  # Limit to top 10 related foods
             break
     logger.info(f"top related recipes: {unique_top_recipes}")
     return unique_top_recipes
