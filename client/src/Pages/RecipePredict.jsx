@@ -14,6 +14,7 @@ function RecipePredict() {
   const [imagePreview, setImagePreview] = useState(null);
   const [relatedFoods, setRelatedFoods] = useState([]);
   const [imageSrc, setImageSrc] = useState("");
+  const [imageUrls, setImageUrls] = useState([]);
 
   const navigate = useNavigate();
   const { user } = useContext(userContext);
@@ -57,6 +58,7 @@ function RecipePredict() {
       setRecipeUrl(result.recipe_url);
       setInstructions(result.recipe_details);
       setRelatedFoods(result.related_foods);
+      setImageUrls(result.related_food_urls);
 
       useEffect(() => {
         if (predictedLabel) {
@@ -233,7 +235,7 @@ function RecipePredict() {
         </div>
       )} */}
 
-      {relatedFoods.length > 0 && (
+      {/* {relatedFoods.length > 0 && (
         <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded w-[1000px]">
           <h3 className="text-lg font-bold">Related Foods:</h3>
           <ul className="flex flex-wrap space-x-4">
@@ -249,35 +251,25 @@ function RecipePredict() {
             ))}
           </ul>
         </div>
-      )}
+      )} */}
 
-      {/* <div className="food-gallery">
-        {relatedFoods.map((food, index) => (
-          <div key={index} className="food-item">
-            <img src={getImageSrc(food)} alt={food} className="food-image" />
-            <p>{food}</p>
-          </div>
-        ))}
-      </div> */}
-
-      {/* <div className="mt-8">
-        <h2 className="text-lg font-bold">Recipe Images</h2>
-        <div className="grid grid-cols-5 gap-4">
-          {imageUrls.length > 0 ? (
-            imageUrls.map((url, index) => (
-              <div key={index} className="image-item">
+      {relatedFoods.length > 0 && (
+        <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded w-[1000px]">
+          <h3 className="text-lg font-bold">Related Foods:</h3>
+          <ul className="flex flex-wrap space-x-4">
+            {relatedFoods.map((food, index) => (
+              <li key={index} className="flex flex-col items-center">
                 <img
-                  src={`${proxyUrl}${url}`}
-                  alt={`Recipe ${index + 1}`}
-                  className="w-40 h-40 object-cover border-2 border-gray-300 rounded-lg"
+                  src={imageUrls[index]} // Use the corresponding URL from imageUrls
+                  alt={food.recipe_name}
+                  className="w-40 h-auto object-cover border border-gray-300 rounded-md"
                 />
-              </div>
-            ))
-          ) : (
-            <p>Loading images...</p>
-          )}
+                <p>{food.recipe_name}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div> */}
+      )}
 
       <button
         onClick={() => navigate("/dashboard")} // Navigate to the Prediction component

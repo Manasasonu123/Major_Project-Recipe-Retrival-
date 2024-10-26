@@ -13,6 +13,7 @@ from keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout
 from tensorflow.keras import regularizers
+import os
 
 
 app = Flask(__name__)
@@ -370,38 +371,55 @@ def get_related_food_names(image):
     logger.info(f"top related recipes: {unique_top_recipes}")
     return unique_top_recipes
 
-def get_recipe_images(recipe_names):
-    images = []
-    for recipe in recipe_names:
-        # Format the recipe name for search
-        query = recipe.replace("_", "+")
-        url = f"https://hebbarskitchen.com/?s={query}"  # Example website
-        
-        # logger.info(f"Scraping URL: {url}")  # Add this print to debug
+# def check_image(food_name):
+#     # Define the directory where your images are stored
+#     image_directory = '../client/public/images/'
+#     extensions = ['.jpg', '.jpeg', '.jfif']
+    
+#     image_paths=[]
 
-        try:
-        # Scraping logic
-            response = requests.get(url)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Assuming images are inside an 'img' tag (you can customize this based on the actual site)
-            img_tag = soup.find('span', class_='entry-thumb td-thumb-css')  # Replace with the specific tag/class from the site you're scraping
-            # logger.info(f"Scraped tag: {img_tag}")
+#     # Check for the existence of the image file
+#     for food in food_name:
+#         # Remove underscores from the food name
+#         clean_food_name = food.replace('_', ' ')
+#         for ext in extensions:
+#             image_path = os.path.join(image_directory, f"{clean_food_name}{ext}")
+#             logger.info(f"imgpaths:{image_path}")
+#             if os.path.isfile(image_path):  # Check if the file exists
+#                 image_paths.append(f"/images/{clean_food_name}{ext}")
+#                 break 
 
-            if img_tag and 'background-image' in img_tag.get('style', ''):
-                # Extracting the URL from the 'background-image' style attribute
-                style_attr = img_tag['style']
-                img_url = style_attr.split('url(')[-1].split(')')[0].strip('"')
-                images.append(img_url)
-                # logger.info(f"Found image URL: {img_url}")
-            else:
-                # If no image found, append a default image URL
-                images.append("https://via.placeholder.com/150")  # Replace with a default placeholder image URL
-        except Exception as e:
-            logger.error(f"Error fetching image for {recipe}: {e}")
-            images.append("https://via.placeholder.com/150")
-    logger.info(f"Final images list: {images}")
-    return images  # Return the list of image URLs
+#     # Return a default image path if none are found
+#     return image_paths
+
+
+def check_image(food_names):
+    # Define the absolute path to the images directory
+    image_directory = os.path.abspath('../client/public/images/')
+    extensions = ['.jpg', '.jpeg', '.jfif']
+    image_paths = []
+
+    for food in food_names:
+        # Replace underscores with spaces to match the expected image file naming
+        clean_food_name = food.replace('_', ' ')
+        found_image = False
+
+        # Check each possible extension to find an image that exists
+        for ext in extensions:
+            image_path = os.path.join(image_directory, f"{clean_food_name}{ext}")
+            if os.path.isfile(image_path):  # Check if the file exists
+                # Append the relative path to the image that can be used in the frontend
+                relative_path = f"/images/{clean_food_name}{ext}"
+                image_paths.append(relative_path)
+                found_image = True
+                break  # Stop once the first valid image is found
+
+        if not found_image:
+            # Add a default image path if none found for the current food name
+            image_paths.append("/images/default.jpg")
+
+    return image_paths
+
 
 
 # Route for predicting only the food name
@@ -515,21 +533,16 @@ def predict_and_scrape():
         else:
             related_food_list = []
         
-        # logger.info(f"top related recipes: {related_foods}")
+        related_food_urls = check_image(related_foods)
+        logger.info(f"predicted path: {related_food_urls}")
 
-        related_photo_url = get_recipe_images(related_foods)
-
-        # logger.info(f"Final images list: {related_photo_url}")
-
-
-        # logger.info(related_photo_url)
         return jsonify({
             'predicted_class': int(predicted_class),
             'recipe_url': recipe_url,
             'predicted_label': predicted_label,
             'recipe_details': recipe_details,
             'related_foods': related_food_list,
-            #'related_photo_url':related_photo_url
+            'related_food_urls':related_food_urls
         })
     except Exception as e:
         logger.error(f"Error during prediction and scraping: {e}")
