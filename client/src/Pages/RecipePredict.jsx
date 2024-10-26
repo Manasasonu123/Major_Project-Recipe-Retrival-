@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { userContext } from "../../context/userContext";
 import { useContext } from "react";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 function RecipePredict() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -13,7 +13,6 @@ function RecipePredict() {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [relatedFoods, setRelatedFoods] = useState([]);
-  const [imageSrc, setImageSrc] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
 
   const navigate = useNavigate();
@@ -60,12 +59,6 @@ function RecipePredict() {
       setRelatedFoods(result.related_foods);
       setImageUrls(result.related_food_urls);
 
-      useEffect(() => {
-        if (predictedLabel) {
-          getImageSrc(predictedLabel).then((src) => setImageSrc(src));
-        }
-      }, [predictedLabel]);
-
       // Save the prediction to the backend with userId
       savePrediction(result.predicted_label, result.recipe_details, user.id); // Use user._id from UserContext
     } catch (error) {
@@ -77,7 +70,6 @@ function RecipePredict() {
 
   const savePrediction = async (predictedLabel, recipeDetails, userId) => {
     try {
-      //
       const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
       const response = await fetch(
         "http://localhost:8000/users/add-prediction",
@@ -109,20 +101,6 @@ function RecipePredict() {
       console.error("Error saving prediction:", error);
     }
   };
-
-  // Function to get the image path for related foods
-  const getImagePath = (foodName) => {
-    return `/images/${foodName}.jpeg`; // Adjust as needed for .jpeg or other formats
-  };
-
-  // const getImageSrc = (food) => {
-  //   try {
-  //     // Try loading .jpg first, if fails, load .jpeg
-  //     return require(`/public/image/${food}.jpg`);
-  //   } catch (err) {
-  //     return require(`/public/image/${food}.jpeg`);
-  //   }
-  // };
 
   return (
     <div className="flex flex-col items-center justify-center h-min-screen">
