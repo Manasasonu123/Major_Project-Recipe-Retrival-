@@ -13,7 +13,7 @@ function Prediction() {
             Want to find the name of Food?
           </h1>
           <Link to="/namepredict">
-            <button className="bg-red-500 text-white h-[50px] px-4 rounded-lg hover:bg-red-600 transition duration-300">
+            <button className="bg-red-600 text-white h-[50px] px-4 rounded-lg hover:bg-red-700 transition duration-300">
               Generate Name
             </button>
           </Link>
@@ -27,7 +27,7 @@ function Prediction() {
             Want to find the recipe of Food?
           </h1>
           <Link to="/recipepredict">
-            <button className="bg-red-500 text-white h-[50px] px-4 rounded-lg hover:bg-red-600 transition duration-300">
+            <button className="bg-red-600 text-white h-[50px] px-4 rounded-lg hover:bg-red-700 transition duration-300">
               Generate Recipe
             </button>
           </Link>

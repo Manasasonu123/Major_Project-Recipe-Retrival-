@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { userContext } from "../../context/userContext";; 
+import { userContext } from "../../context/userContext";
 import { useContext } from "react";
+import { useEffect } from "react";
 
 function RecipePredict() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -12,6 +13,7 @@ function RecipePredict() {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [relatedFoods, setRelatedFoods] = useState([]);
+  const [imageSrc, setImageSrc] = useState("");
 
   const navigate = useNavigate();
   const { user } = useContext(userContext);
@@ -30,11 +32,10 @@ function RecipePredict() {
       return;
     }
 
-
-  if (!user || !user.id) {
-    alert("User is not logged in");
-    return;
-  }
+    if (!user || !user.id) {
+      alert("User is not logged in");
+      return;
+    }
 
     setLoading(true);
 
@@ -50,7 +51,6 @@ function RecipePredict() {
 
       // Parse the JSON response
       const result = await response.json();
-      
 
       // Set the predicted label to display in frontend
       setPredictedLabel(result.predicted_label);
@@ -58,8 +58,14 @@ function RecipePredict() {
       setInstructions(result.recipe_details);
       setRelatedFoods(result.related_foods);
 
-       // Save the prediction to the backend with userId
-       savePrediction(result.predicted_label, result.recipe_details, user.id);
+      useEffect(() => {
+        if (predictedLabel) {
+          getImageSrc(predictedLabel).then((src) => setImageSrc(src));
+        }
+      }, [predictedLabel]);
+
+      // Save the prediction to the backend with userId
+      savePrediction(result.predicted_label, result.recipe_details, user.id); // Use user._id from UserContext
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
@@ -69,49 +75,55 @@ function RecipePredict() {
 
   const savePrediction = async (predictedLabel, recipeDetails, userId) => {
     try {
-      // 
+      //
       const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
-      const response = await fetch('http://localhost:8000/users/add-prediction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          food_name: predictedLabel, // Corrected: Changed to food_name
-          recipe: combinedRecipe, // Corrected: Changed to recipe
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:8000/users/add-prediction",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            food_name: predictedLabel, // Corrected: Changed to food_name
+            recipe: combinedRecipe, // Corrected: Changed to recipe
+          }),
+        }
+      );
       console.log(response);
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const result = await response.json();
       if (result.error) {
         console.error(result.error);
       } else {
-        console.log('Prediction saved:', result.predicted_value);
+        console.log("Prediction saved:", result.predicted_value);
       }
     } catch (error) {
-      console.error('Error saving prediction:', error);
+      console.error("Error saving prediction:", error);
     }
   };
-  
-  
-  
 
+  // Function to get the image path for related foods
+  const getImagePath = (foodName) => {
+    return `/images/${foodName}.jpeg`; // Adjust as needed for .jpeg or other formats
+  };
 
-
-  
+  // const getImageSrc = (food) => {
+  //   try {
+  //     // Try loading .jpg first, if fails, load .jpeg
+  //     return require(`/public/image/${food}.jpg`);
+  //   } catch (err) {
+  //     return require(`/public/image/${food}.jpeg`);
+  //   }
+  // };
 
   return (
-    
     <div className="flex flex-col items-center justify-center h-min-screen">
-       {!!user && user.fullName && (
-          <h2 className="text-center text-xl mt-4">Hi {user.fullName}</h2>
-        )} 
       <h1 className="text-4xl font-bold mb-8">Food Recipie Generator</h1>
       <form
         onSubmit={handleSubmit}
@@ -206,13 +218,12 @@ function RecipePredict() {
         </div>
       )}
 
-      {predictedLabel && (
-        <div>
-          <h2>Predicted Food: {predictedLabel}</h2>
+      {/* {predictedLabel && (
+        <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded w-[1000px]">
           {relatedFoods.length > 0 && (
             <div>
-              <h3>Related Foods:</h3>
-              <ul>
+              <h3 className="text-lg font-bold">Related Foods:</h3>
+              <ul className="flex space-x-8">
                 {relatedFoods.map((food, index) => (
                   <li key={index}>Recipe: {food.recipe_name}</li>
                 ))}
@@ -220,14 +231,53 @@ function RecipePredict() {
             </div>
           )}
         </div>
+      )} */}
+
+      {relatedFoods.length > 0 && (
+        <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded w-[1000px]">
+          <h3 className="text-lg font-bold">Related Foods:</h3>
+          <ul className="flex flex-wrap space-x-4">
+            {relatedFoods.map((food, index) => (
+              <li key={index} className="flex flex-col items-center">
+                <img
+                  src={getImagePath(food.recipe_name)} // Use the getImagePath function to get the image src
+                  alt={food.recipe_name}
+                  className="w-40 h-auto object-cover border border-gray-300 rounded-md"
+                />
+                <p>{food.recipe_name}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      {/* {recipe_details && (
-        <div className="flex flex-col mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <h2 className="text-lg font-bold">Instructions:</h2>
-          <p className="text-xl">{recipe_details}</p>
+      {/* <div className="food-gallery">
+        {relatedFoods.map((food, index) => (
+          <div key={index} className="food-item">
+            <img src={getImageSrc(food)} alt={food} className="food-image" />
+            <p>{food}</p>
+          </div>
+        ))}
+      </div> */}
+
+      {/* <div className="mt-8">
+        <h2 className="text-lg font-bold">Recipe Images</h2>
+        <div className="grid grid-cols-5 gap-4">
+          {imageUrls.length > 0 ? (
+            imageUrls.map((url, index) => (
+              <div key={index} className="image-item">
+                <img
+                  src={`${proxyUrl}${url}`}
+                  alt={`Recipe ${index + 1}`}
+                  className="w-40 h-40 object-cover border-2 border-gray-300 rounded-lg"
+                />
+              </div>
+            ))
+          ) : (
+            <p>Loading images...</p>
+          )}
         </div>
-      )} */}
+      </div> */}
 
       <button
         onClick={() => navigate("/dashboard")} // Navigate to the Prediction component
@@ -240,4 +290,3 @@ function RecipePredict() {
 }
 
 export default RecipePredict;
-

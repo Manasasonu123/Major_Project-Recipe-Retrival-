@@ -4,9 +4,7 @@ import { Link } from "react-router-dom";
 function Welcome() {
   return (
     <div className="flex flex-col items-center mt-60">
-      <h1 className="text-6xl font-bold mb-8">
-        Welcome to Food Recipe Prediction
-      </h1>
+      <h1 className="text-6xl font-bold mb-8">Welcome to Snap and Savour</h1>
       <p className="text-xl mb-24 text-center">
         Discover the ingredients and recipes from your favorite dishes with just
         an image.
