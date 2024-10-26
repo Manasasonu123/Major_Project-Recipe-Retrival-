@@ -4,6 +4,6 @@ recipe_embds205.txt
 training_names.txt
 vgg16_modelfeatures.h5
 best_weights_205attempt5class.weights.h5
-best_weights_122_Indian_attempt3class.weights.h5
+# best_weights_122_Indian_attempt3class.weights.h5
 images
-model.h5
+# model.h5
