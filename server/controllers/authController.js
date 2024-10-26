@@ -101,9 +101,24 @@ const getProfile=(req,res)=>{
     }
 }
 
+const logoutUser = (req, res) => {
+    try {
+        // Clear the JWT token from cookies
+        res.clearCookie('token');
+        
+        // Send a response indicating successful logout
+        return res.json({ message: 'Logout successful' });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error during logout' });
+    }
+};
+
+
 module.exports = {
     test,
     registerUser,
     loginUser,
-    getProfile
+    getProfile,
+    logoutUser // Add this to the exports
 };

@@ -172,6 +172,87 @@ def get_related_food_names(image):
     return unique_top_recipes
 
 
+@app.route('/predict-indian-and-scrape', methods=['POST'])
+def predict_and_scrape():
+
+    model = models['inception']
+
+    class_names = {
+    1: 'adhirasam',2: 'aloo baida',3: 'aloo chaat',4: 'aloo chokha',5: 'aloo gajar',6: 'aloo gobi',7: 'aloo kachori',8: 'aloo matar',9: 'aloo methi',10: 'aloo shimla mirch',11: 'aloo tikki',12: 'anarsa',13: 'apple crisp',14: 'apple pie',15: 'apricot chutney',16: 'ariselu',17: 'arugula salad',18: 'authentic jamaican curry chicken',19: 'baby back ribs',20: 'baked ziti',21: 'baklava',22: 'balsamic chicken',23: 'bandar laddu',24: 'basundi',25: 'beet salad',26: 'beetroot paratha',27: 'bhatura',28: 'bhindi masala',29: 'bibimbap',30: 'biryani',31: 'bisi bele bath',32: 'bisibelebath',33: 'bombay sandwich',34: 'boondi',35: 'brownie',36: 'burger',37: 'butter chicken',38: 'chak hao kheer',39: 'cham cham',40: 'chana masala',41: 'chapati',42: 'chhena kheeri',43: 'chicken chettinad',44: 'chicken curry',45: 'chicken razala',46: 'chicken tikka',47: 'chicken tikka_masala',48: 'chicken wings',49: 'chikki',50: 'chocolate burfi',51: 'chocolate cake',52: 'chow chow bath',53: 'churros',54: 'clam chowder',55: 'club sandwich',56: 'coconut chutney',57: 'corn soup',58: 'creme brulee',59: 'croissant',60: 'cup cakes',61:'curry mussels',62: 'daal baati churma',63: 'daal puri',64: 'dal makhani',65: 'dal_tadka',66: 'deviled eggs',67: 'dharwad pedha',68: 'donuts',69: 'doodhpak',70: 'dosa',71: 'double ka meetha',72: 'dum aloo',73: 'dumplings',74: 'edamame',75: 'egg bhurji',76: 'egg roll',77: 'escargots',78: 'falafel',79: 'french fries',80: 'french onion soup',81: 'french toast',82: 'fried rice',83: 'frozen yogurt',84: 'gajar ka halva',85: 'garlic bread',86: 'gavvalu',87: 'ghever',88: 'gnocchi',89: 'goan fish curry',90: 'gobi 65',91: 'greek salad',92: 'green curry chicken_salad',93: 'grilled cheese sandwich',94: 'grilled salmon',95: 'guacamole',96: 'gulab jamun',97: 'hamburger',98: 'hot and sour soup',99: 'hot dog',100: 'huevos rancheros',101: 'hummus',102: 'ice cream',103: 'idly',104: 'imarti',105: 'jalebi',106: 'kachori',107: 'kadai egg',108: 'kadai paneer',109: 'kadhi pakoda',110: 'kajjikaya',111: 'kaju katli kaju barfi',112: 'kakinada khaja',113: 'kalakand',114: 'karela bharta',115: 'kathi roll',116: 'kofta',117: 'kulfi',118: 'kuzhi paniyaram',119: 'lasagna',120: 'lassi',121: 'ledikeni',122: 'litti chokha',123: 'lyangcha',124: 'maach jhol',125: 'macaroni and cheese', 126: 'macarons', 127: 'makki di roti sarson da saag', 128: 'malabar parotta',129: 'malapua',130: 'mango lassi',131: 'masala tea chai',132: 'meduvadai',133: 'misi roti',134: 'miso soup',135: 'misti doi',136: 'modak',137:'mussels', 138: 'mysore pak', 139: 'naan', 140: 'nachos', 141: 'navrattan korma', 142: 'noodles', 143: 'omelette', 144: 'onion rings',
+    145: 'oysters',146: 'pad thai',147: 'paella',148: 'palak paneer',149: 'pancakes',150: 'paneer butter masala',151: 'paneer kulcha',152: 'paneer pakora',153: 'panna cotta',154: 'pasta',155: 'pathiri',156: 'phirni',157: 'pho',158: 'pizza',159: 'poha',160: 'poori',161: 'poornalu',162: 'pootharekulu',163: 'pulled pork sandwich',164: 'qubani ka meetha',165: 'rabri',166: 'ragi mudde ragi sankati',167: 'ramen',168: 'ras malai',169: 'rasgulla',170: 'ravioli',171: 'red velvet cake',172: 'risotto',173: 'samosa',174: 'sandesh',175: 'sashimi',176: 'scallops',177:'seaweed_salad',178: 'shankarpali',179: 'shawarma',180: 'sheer_korma',181: 'sheera',182: 'shrikhand',183: 'shrimp_and_grits',184: 'slow cooker lamb curry',185: 'sohan halwa',186: 'sohan papdi',187: 'sorpotel',188: 'spaghetti carbonara',189: 'spinach wrap',190: 'spring rolls',191: 'strawberry shortcake',192: 'stuffed mirchi mirapakaya bajji',193: 'surti undhiyu',194: 'sushi',195: 'sutar feni',196: 'tacos',197: 'tandoori chicken',198: 'tawa paneer',199: 'tiramisu',200: 'tomato uttapam',201: 'unni appam',202: 'upma',203: 'vada pav',204: 'waffles'
+}
+
+    if 'image' not in request.files:
+        logger.warning("No image part in the request.")
+        return jsonify({'error': 'No image provided.'}), 400
+    
+    file = request.files['image']
+
+    if file.filename == '':
+        logger.warning("No selected file.")
+        return jsonify({'error': 'No selected image.'}), 400
+    
+    try:
+        image = Image.open(file).convert('RGB')
+        image = image.resize((img_width, img_height))  # Resize the image to match input shape
+        image_array = np.array(image) / 255.0  # Normalize image
+        image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        return jsonify({'error': 'Invalid image file.'}), 400
+    
+    processed_image = preprocess_image(image)
+    if processed_image is None:
+        return jsonify({'error': 'Error processing image.'}), 500
+    
+    try:
+        # Predict the class of the image
+        prediction = model.predict(processed_image)
+        predicted_class = np.argmax(prediction, axis=-1)[0]
+        predicted_label = class_names.get(predicted_class, "Unknown class")
+        logger.info(f"Predicted label: {predicted_label}")
+
+        # Perform web scraping using the predicted label
+        recipe_url = search_recipe(predicted_label)
+
+        if recipe_url:
+            # Call the function to scrape the specific recipe
+            recipe_details = scrape_recipe(recipe_url)
+
+            # return jsonify({
+            #     'predicted_class': int(predicted_class),
+            #     'predicted_label': predicted_label,
+            #     'recipe_url': recipe_url,
+            #     'recipe_details': recipe_details
+            # })
+        else:
+            recipe_details = {'recipe_url': 'No recipe found.'}
+            # return jsonify({
+            #     'predicted_class': int(predicted_class),
+            #     'predicted_label': predicted_label,
+            #     'recipe_url': 'No recipe found.'
+            # })
+
+        # Get related food names with similarity scores
+        related_foods = get_related_food_names(image)
+
+        # Prepare response with the related food names and their similarity scores
+        if related_foods:
+            related_food_list = [{'recipe_name': recipe} for recipe in related_foods]
+        else:
+            related_food_list = []
+
+        return jsonify({
+            'predicted_class': int(predicted_class),
+            'recipe_url': recipe_url,
+            'predicted_label': predicted_label,
+            'recipe_details': recipe_details,
+            'related_foods': related_food_list
+        })
+    except Exception as e:
+        logger.error(f"Error during prediction and scraping: {e}")
+        return jsonify({'error': 'Prediction and scraping failed.'}), 500
+    
 # Route for predicting and scraping recipes
 @app.route('/predict-and-scrape', methods=['POST'])
 def predict_and_scrape():
@@ -179,210 +260,8 @@ def predict_and_scrape():
     model = models['inception']
 
     class_names = {
-    1: 'adhirasam',
-    2: 'aloo baida',
-    3: 'aloo chaat',
-    4: 'aloo chokha',
-    5: 'aloo gajar',
-    6: 'aloo gobi',
-    7: 'aloo kachori',
-    8: 'aloo matar',
-    9: 'aloo methi',
-    10: 'aloo shimla mirch',
-    11: 'aloo tikki',
-    12: 'anarsa',
-    13: 'apple crisp',
-    14: 'apple pie',
-    15: 'apricot chutney',
-    16: 'ariselu',
-    17: 'arugula salad',
-    18: 'authentic jamaican curry chicken',
-    19: 'baby back ribs',
-    20: 'baked ziti',
-    21: 'baklava',
-    22: 'balsamic chicken',
-    23: 'bandar laddu',
-    24: 'basundi',
-    25: 'beet salad',
-    26: 'beetroot paratha',
-    27: 'bhatura',
-    28: 'bhindi masala',
-    29: 'bibimbap',
-    30: 'biryani',
-    31: 'bisi bele bath',
-    32: 'bisibelebath',
-    33: 'bombay sandwich',
-    34: 'boondi',
-    35: 'brownie',
-    36: 'burger',
-    37: 'butter chicken',
-    38: 'chak hao kheer',
-    39: 'cham cham',
-    40: 'chana masala',
-    41: 'chapati',
-    42: 'chhena kheeri',
-    43: 'chicken chettinad',
-    44: 'chicken curry',
-    45: 'chicken razala',
-    46: 'chicken tikka',
-    47: 'chicken tikka_masala',
-    48: 'chicken wings',
-    49: 'chikki',
-    50: 'chocolate burfi',
-    51: 'chocolate cake',
-    52: 'chow chow bath',
-    53: 'churros',
-    54: 'clam chowder',
-    55: 'club sandwich',
-    56: 'coconut chutney',
-    57: 'corn soup',
-    58: 'creme brulee',
-    59: 'croissant',
-    60: 'cup cakes',
-    61: 'curry mussels',
-    62: 'daal baati churma',
-    63: 'daal puri',
-    64: 'dal makhani',
-    65: 'dal_tadka',
-    66: 'deviled eggs',
-    67: 'dharwad pedha',
-    68: 'donuts',
-    69: 'doodhpak',
-    70: 'dosa',
-    71: 'double ka meetha',
-    72: 'dum aloo',
-    73: 'dumplings',
-    74: 'edamame',
-    75: 'egg bhurji',
-    76: 'egg roll',
-    77: 'escargots',
-    78: 'falafel',
-    79: 'french fries',
-    80: 'french onion soup',
-    81: 'french toast',
-    82: 'fried rice',
-    83: 'frozen yogurt',
-    84: 'gajar ka halva',
-    85: 'garlic bread',
-    86: 'gavvalu',
-    87: 'ghever',
-    88: 'gnocchi',
-    89: 'goan fish curry',
-    90: 'gobi 65',
-    91: 'greek salad',
-    92: 'green curry chicken_salad',
-    93: 'grilled cheese sandwich',
-    94: 'grilled salmon',
-    95: 'guacamole',
-    96: 'gulab jamun',
-    97: 'hamburger',
-    98: 'hot and sour soup',
-    99: 'hot dog',
-    100: 'huevos rancheros',
-    101: 'hummus',
-    102: 'ice cream',
-    103: 'idly',
-    104: 'imarti',
-    105: 'jalebi',
-    106: 'kachori',
-    107: 'kadai egg',
-    108: 'kadai paneer',
-    109: 'kadhi pakoda',
-    110: 'kajjikaya',
-    111: 'kaju katli kaju barfi',
-    112: 'kakinada khaja',
-    113: 'kalakand',
-    114: 'karela bharta',
-    115: 'kathi roll',
-    116: 'kofta',
-    117: 'kulfi',
-    118: 'kuzhi paniyaram',
-    119: 'lasagna',
-    120: 'lassi',
-    121: 'ledikeni',
-    122: 'litti chokha',
-    123: 'lyangcha',
-    124: 'maach jhol',
-    125: 'macaroni and cheese',
-    126: 'macarons',
-    127: 'makki di roti sarson da saag',
-    128: 'malabar parotta',
-    129: 'malapua',
-    130: 'mango lassi',
-    131: 'masala tea chai',
-    132: 'meduvadai',
-    133: 'misi roti',
-    134: 'miso soup',
-    135: 'misti doi',
-    136: 'modak',
-    137: 'mussels',
-    138: 'mysore pak',
-    139: 'naan',
-    140: 'nachos',
-    141: 'navrattan korma',
-    142: 'noodles',
-    143: 'omelette',
-    144: 'onion rings',
-    145: 'oysters',
-    146: 'pad thai',
-    147: 'paella',
-    148: 'palak paneer',
-    149: 'pancakes',
-    150: 'paneer butter masala',
-    151: 'paneer kulcha',
-    152: 'paneer pakora',
-    153: 'panna cotta',
-    154: 'pasta',
-    155: 'pathiri',
-    156: 'phirni',
-    157: 'pho',
-    158: 'pizza',
-    159: 'poha',
-    160: 'poori',
-    161: 'poornalu',
-    162: 'pootharekulu',
-    163: 'pulled pork sandwich',
-    164: 'qubani ka meetha',
-    165: 'rabri',
-    166: 'ragi mudde ragi sankati',
-    167: 'ramen',
-    168: 'ras malai',
-    169: 'rasgulla',
-    170: 'ravioli',
-    171: 'red velvet cake',
-    172: 'risotto',
-    173: 'samosa',
-    174: 'sandesh',
-    175: 'sashimi',
-    176: 'scallops',
-    177: 'seaweed_salad',
-    178: 'shankarpali',
-    179: 'shawarma',
-    180: 'sheer_korma',
-    181: 'sheera',
-    182: 'shrikhand',
-    183: 'shrimp_and_grits',
-    184: 'slow cooker lamb curry',
-    185: 'sohan halwa',
-    186: 'sohan papdi',
-    187: 'sorpotel',
-    188: 'spaghetti carbonara',
-    189: 'spinach wrap',
-    190: 'spring rolls',
-    191: 'strawberry shortcake',
-    192: 'stuffed mirchi mirapakaya bajji',
-    193: 'surti undhiyu',
-    194: 'sushi',
-    195: 'sutar feni',
-    196: 'tacos',
-    197: 'tandoori chicken',
-    198: 'tawa paneer',
-    199: 'tiramisu',
-    200: 'tomato uttapam',
-    201: 'unni appam',
-    202: 'upma',
-    203: 'vada pav',
-    204: 'waffles'
+    1: 'adhirasam',2: 'aloo baida',3: 'aloo chaat',4: 'aloo chokha',5: 'aloo gajar',6: 'aloo gobi',7: 'aloo kachori',8: 'aloo matar',9: 'aloo methi',10: 'aloo shimla mirch',11: 'aloo tikki',12: 'anarsa',13: 'apple crisp',14: 'apple pie',15: 'apricot chutney',16: 'ariselu',17: 'arugula salad',18: 'authentic jamaican curry chicken',19: 'baby back ribs',20: 'baked ziti',21: 'baklava',22: 'balsamic chicken',23: 'bandar laddu',24: 'basundi',25: 'beet salad',26: 'beetroot paratha',27: 'bhatura',28: 'bhindi masala',29: 'bibimbap',30: 'biryani',31: 'bisi bele bath',32: 'bisibelebath',33: 'bombay sandwich',34: 'boondi',35: 'brownie',36: 'burger',37: 'butter chicken',38: 'chak hao kheer',39: 'cham cham',40: 'chana masala',41: 'chapati',42: 'chhena kheeri',43: 'chicken chettinad',44: 'chicken curry',45: 'chicken razala',46: 'chicken tikka',47: 'chicken tikka_masala',48: 'chicken wings',49: 'chikki',50: 'chocolate burfi',51: 'chocolate cake',52: 'chow chow bath',53: 'churros',54: 'clam chowder',55: 'club sandwich',56: 'coconut chutney',57: 'corn soup',58: 'creme brulee',59: 'croissant',60: 'cup cakes',61:'curry mussels',62: 'daal baati churma',63: 'daal puri',64: 'dal makhani',65: 'dal_tadka',66: 'deviled eggs',67: 'dharwad pedha',68: 'donuts',69: 'doodhpak',70: 'dosa',71: 'double ka meetha',72: 'dum aloo',73: 'dumplings',74: 'edamame',75: 'egg bhurji',76: 'egg roll',77: 'escargots',78: 'falafel',79: 'french fries',80: 'french onion soup',81: 'french toast',82: 'fried rice',83: 'frozen yogurt',84: 'gajar ka halva',85: 'garlic bread',86: 'gavvalu',87: 'ghever',88: 'gnocchi',89: 'goan fish curry',90: 'gobi 65',91: 'greek salad',92: 'green curry chicken_salad',93: 'grilled cheese sandwich',94: 'grilled salmon',95: 'guacamole',96: 'gulab jamun',97: 'hamburger',98: 'hot and sour soup',99: 'hot dog',100: 'huevos rancheros',101: 'hummus',102: 'ice cream',103: 'idly',104: 'imarti',105: 'jalebi',106: 'kachori',107: 'kadai egg',108: 'kadai paneer',109: 'kadhi pakoda',110: 'kajjikaya',111: 'kaju katli kaju barfi',112: 'kakinada khaja',113: 'kalakand',114: 'karela bharta',115: 'kathi roll',116: 'kofta',117: 'kulfi',118: 'kuzhi paniyaram',119: 'lasagna',120: 'lassi',121: 'ledikeni',122: 'litti chokha',123: 'lyangcha',124: 'maach jhol',125: 'macaroni and cheese', 126: 'macarons', 127: 'makki di roti sarson da saag', 128: 'malabar parotta',129: 'malapua',130: 'mango lassi',131: 'masala tea chai',132: 'meduvadai',133: 'misi roti',134: 'miso soup',135: 'misti doi',136: 'modak',137:'mussels', 138: 'mysore pak', 139: 'naan', 140: 'nachos', 141: 'navrattan korma', 142: 'noodles', 143: 'omelette', 144: 'onion rings',
+    145: 'oysters',146: 'pad thai',147: 'paella',148: 'palak paneer',149: 'pancakes',150: 'paneer butter masala',151: 'paneer kulcha',152: 'paneer pakora',153: 'panna cotta',154: 'pasta',155: 'pathiri',156: 'phirni',157: 'pho',158: 'pizza',159: 'poha',160: 'poori',161: 'poornalu',162: 'pootharekulu',163: 'pulled pork sandwich',164: 'qubani ka meetha',165: 'rabri',166: 'ragi mudde ragi sankati',167: 'ramen',168: 'ras malai',169: 'rasgulla',170: 'ravioli',171: 'red velvet cake',172: 'risotto',173: 'samosa',174: 'sandesh',175: 'sashimi',176: 'scallops',177:'seaweed_salad',178: 'shankarpali',179: 'shawarma',180: 'sheer_korma',181: 'sheera',182: 'shrikhand',183: 'shrimp_and_grits',184: 'slow cooker lamb curry',185: 'sohan halwa',186: 'sohan papdi',187: 'sorpotel',188: 'spaghetti carbonara',189: 'spinach wrap',190: 'spring rolls',191: 'strawberry shortcake',192: 'stuffed mirchi mirapakaya bajji',193: 'surti undhiyu',194: 'sushi',195: 'sutar feni',196: 'tacos',197: 'tandoori chicken',198: 'tawa paneer',199: 'tiramisu',200: 'tomato uttapam',201: 'unni appam',202: 'upma',203: 'vada pav',204: 'waffles'
 }
 
     if 'image' not in request.files:

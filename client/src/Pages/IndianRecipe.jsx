@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { userContext } from "../../context/userContext";; 
+import { useContext } from "react";
 
-function IndianRecipe() {
+function RecipePredict() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [predictedLabel, setPredictedLabel] = useState("");
   const [recipeUrl, setRecipeUrl] = useState("");
   const [recipe_details, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [relatedFoods, setRelatedFoods] = useState([]);
 
   const navigate = useNavigate();
+  const { user } = useContext(userContext);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -26,6 +30,12 @@ function IndianRecipe() {
       return;
     }
 
+
+  if (!user || !user.id) {
+    alert("User is not logged in");
+    return;
+  }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -33,18 +43,23 @@ function IndianRecipe() {
 
     try {
       // Make the POST request to the Flask API
-      const response = await fetch("http://localhost:5000/predict-and-scrape-indian", {
+      const response = await fetch("http://localhost:5000/predict-indian-and-scrape", {
         method: "POST",
         body: formData,
       });
 
       // Parse the JSON response
       const result = await response.json();
+      
 
       // Set the predicted label to display in frontend
       setPredictedLabel(result.predicted_label);
       setRecipeUrl(result.recipe_url);
       setInstructions(result.recipe_details);
+      setRelatedFoods(result.related_foods);
+
+       // Save the prediction to the backend with userId
+       savePrediction(result.predicted_label, result.recipe_details, user.id);
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
@@ -52,8 +67,51 @@ function IndianRecipe() {
     }
   };
 
+  const savePrediction = async (predictedLabel, recipeDetails, userId) => {
+    try {
+      // 
+      const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
+      const response = await fetch('http://localhost:8000/users/add-prediction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          food_name: predictedLabel, // Corrected: Changed to food_name
+          recipe: combinedRecipe, // Corrected: Changed to recipe
+        }),
+      });
+      console.log(response);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      if (result.error) {
+        console.error(result.error);
+      } else {
+        console.log('Prediction saved:', result.predicted_value);
+      }
+    } catch (error) {
+      console.error('Error saving prediction:', error);
+    }
+  };
+  
+  
+  
+
+
+
+  
+
   return (
+    
     <div className="flex flex-col items-center justify-center h-min-screen">
+       {!!user && user.fullName && (
+          <h2 className="text-center text-xl mt-4">Hi {user.fullName}</h2>
+        )} 
       <h1 className="text-4xl font-bold mb-8">Indian Food Recipie Generator</h1>
       <form
         onSubmit={handleSubmit}
@@ -148,6 +206,22 @@ function IndianRecipe() {
         </div>
       )}
 
+      {predictedLabel && (
+        <div>
+          <h2>Predicted Food: {predictedLabel}</h2>
+          {relatedFoods.length > 0 && (
+            <div>
+              <h3>Related Foods:</h3>
+              <ul>
+                {relatedFoods.map((food, index) => (
+                  <li key={index}>Recipe: {food.recipe_name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* {recipe_details && (
         <div className="flex flex-col mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
           <h2 className="text-lg font-bold">Instructions:</h2>
@@ -165,4 +239,5 @@ function IndianRecipe() {
   );
 }
 
-export default IndianRecipe;
+export default RecipePredict;
+
