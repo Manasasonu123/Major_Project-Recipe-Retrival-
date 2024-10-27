@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { userContext } from "../../context/userContext";
 import { useContext } from "react";
-// import { useEffect } from "react";
 
 function RecipePredict() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -13,6 +12,7 @@ function RecipePredict() {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [relatedFoods, setRelatedFoods] = useState([]);
+
   const [imageUrls, setImageUrls] = useState([]);
 
   const navigate = useNavigate();
@@ -231,7 +231,7 @@ function RecipePredict() {
         </div>
       )} */}
 
-      {relatedFoods.length > 0 && (
+      {/* {relatedFoods.length > 0 && (
         <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded w-[1000px]">
           <h3 className="text-lg font-bold">Related Foods:</h3>
           <ul className="flex flex-wrap space-x-4">
@@ -247,7 +247,25 @@ function RecipePredict() {
             ))}
           </ul>
         </div>
-      )}
+      )} */}
+      {relatedFoods.length > 0 && (
+  <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded max-w-[1000px]">
+    <h3 className="text-lg font-bold mb-4">Related Foods:</h3>
+    <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {relatedFoods.map((food, index) => (
+        <li key={index} className="flex flex-col items-center">
+          <img
+            src={imageUrls[index]}
+            alt={food.recipe_name}
+            className="w-full h-40 object-cover border border-gray-300 rounded-md"
+          />
+          <p className="mt-2 text-center font-semibold">{food.recipe_name}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
 
       <button
         onClick={() => navigate("/dashboard")} // Navigate to the Prediction component

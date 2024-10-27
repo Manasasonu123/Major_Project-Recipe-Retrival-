@@ -3,8 +3,8 @@ node_modules/
 recipe_embds205.txt
 training_names.txt
 vgg16_modelfeatures.h5
-model.h5
 best_weights_205attempt5class.weights.h5
 best_weights_122_Indian_attempt1class.weights.h5
 best_weights_100_non_Indian_101attempt1class.weights.h5
 images
+bfg-1.13.2.jar
