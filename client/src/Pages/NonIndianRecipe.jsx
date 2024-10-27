@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { userContext } from "../../context/userContext";
+import { useContext } from "react";
 
 function NonIndianRecipe() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -9,8 +11,11 @@ function NonIndianRecipe() {
   const [recipe_details, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [relatedFoods, setRelatedFoods] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
 
   const navigate = useNavigate();
+  const { user } = useContext(userContext);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -23,6 +28,11 @@ function NonIndianRecipe() {
 
     if (!selectedFile) {
       alert("Please select an image to upload");
+      return;
+    }
+
+    if (!user || !user.id) {
+      alert("User is not logged in");
       return;
     }
 
@@ -48,10 +58,49 @@ function NonIndianRecipe() {
       setPredictedLabel(result.predicted_label);
       setRecipeUrl(result.recipe_url);
       setInstructions(result.recipe_details);
+      setRelatedFoods(result.related_foods);
+      setImageUrls(result.related_food_urls);
+
+      // Save the prediction to the backend with userId
+      savePrediction(result.predicted_label, result.recipe_details, user.id); // Use user._id from UserContext
     } catch (error) {
       console.error("Error in prediction:", error);
     } finally {
       setLoading(false); // Set loading back to false when the request is done
+    }
+  };
+
+  const savePrediction = async (predictedLabel, recipeDetails, userId) => {
+    try {
+      const combinedRecipe = `${recipeDetails.ingredient}${recipeDetails.method}`;
+      const response = await fetch(
+        "http://localhost:8000/users/add-prediction",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            food_name: predictedLabel, // Corrected: Changed to food_name
+            recipe: combinedRecipe, // Corrected: Changed to recipe
+          }),
+        }
+      );
+      console.log(response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.error) {
+        console.error(result.error);
+      } else {
+        console.log("Prediction saved:", result.predicted_value);
+      }
+    } catch (error) {
+      console.error("Error saving prediction:", error);
     }
   };
 
@@ -152,13 +201,25 @@ function NonIndianRecipe() {
           )}
         </div>
       )}
-
-      {/* {recipe_details && (
-        <div className="flex flex-col mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <h2 className="text-lg font-bold">Instructions:</h2>
-          <p className="text-xl">{recipe_details}</p>
+      {relatedFoods.length > 0 && (
+        <div className="flex flex-col mt-6 p-4 bg-red-500 bg-opacity-70 border border-red-400 rounded max-w-[1000px]">
+          <h3 className="text-lg font-bold mb-4">Related Foods:</h3>
+          <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {relatedFoods.map((food, index) => (
+              <li key={index} className="flex flex-col items-center">
+                <img
+                  src={imageUrls[index]}
+                  alt={food.recipe_name}
+                  className="w-full h-40 object-cover border border-gray-300 rounded-md"
+                />
+                <p className="mt-2 text-center font-semibold">
+                  {food.recipe_name}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
-      )} */}
+      )}
 
       <button
         onClick={() => navigate("/dashboard")} // Navigate to the Prediction component
