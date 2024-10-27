@@ -33,10 +33,13 @@ function NonIndianRecipe() {
 
     try {
       // Make the POST request to the Flask API
-      const response = await fetch("http://localhost:5000/predict-and-scrape-nonindian", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:5000/predict-non-indian-and-scrape",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       // Parse the JSON response
       const result = await response.json();
@@ -54,7 +57,9 @@ function NonIndianRecipe() {
 
   return (
     <div className="flex flex-col items-center justify-center h-min-screen">
-      <h1 className="text-4xl font-bold mb-8">Non-Indian Food Recipie Generator</h1>
+      <h1 className="text-4xl font-bold mb-8">
+        Non-Indian Food Recipie Generator
+      </h1>
       <form
         onSubmit={handleSubmit}
         className="bg-red-500 bg-opacity-70 p-6 rounded-3xl shadow-md w-full max-w-md"
