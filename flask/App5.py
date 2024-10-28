@@ -32,11 +32,25 @@ class_names = {
     145: 'oysters',146: 'pad thai',147: 'paella',148: 'palak paneer',149: 'pancakes',150: 'paneer butter masala',151: 'paneer kulcha',152: 'paneer pakora',153: 'panna cotta',154: 'pasta',155: 'pathiri',156: 'phirni',157: 'pho',158: 'pizza',159: 'poha',160: 'poori',161: 'poornalu',162: 'pootharekulu',163: 'pulled pork sandwich',164: 'qubani ka meetha',165: 'rabri',166: 'ragi mudde ragi sankati',167: 'ramen',168: 'ras malai',169: 'rasgulla',170: 'ravioli',171: 'red velvet cake',172: 'risotto',173: 'samosa',174: 'sandesh',175: 'sashimi',176: 'scallops',177:'seaweed_salad',178: 'shankarpali',179: 'shawarma',180: 'sheer_korma',181: 'sheera',182: 'shrikhand',183: 'shrimp_and_grits',184: 'slow cooker lamb curry',185: 'sohan halwa',186: 'sohan papdi',187: 'sorpotel',188: 'spaghetti carbonara',189: 'spinach wrap',190: 'spring rolls',191: 'strawberry shortcake',192: 'stuffed mirchi mirapakaya bajji',193: 'surti undhiyu',194: 'sushi',195: 'sutar feni',196: 'tacos',197: 'tandoori chicken',198: 'tawa paneer',199: 'tiramisu',200: 'tomato uttapam',201: 'unni appam',202: 'upma',203: 'vada pav',204: 'waffles'
 }
 
-indian_class_name= {
-    1: 'adhirasam', 2: 'aloo_baida', 3: 'aloo_chaat', 4: 'aloo_chokha', 5: 'aloo_gajar', 6: 'aloo_gobi', 7: 'aloo_kachori', 8: 'aloo_matar', 9: 'aloo_methi', 10: 'aloo_shimla_mirch', 11: 'aloo_tikki', 12: 'anarsa', 13: 'ariselu', 14: 'bandar_laddu', 15: 'basundi', 16: 'beetroot_paratha', 17: 'bhatura', 18: 'bhindi_masala', 19: 'biryani', 20: 'bisibelebath', 21: 'bombay_sandwich', 22: 'boondi', 23: 'butter_chicken', 24: 'chak_hao_kheer', 25: 'cham_cham', 26: 'chana_masala', 27: 'chapati', 28: 'chhena_kheeri', 29: 'chicken_chettinad', 30: 'chicken_curry', 31: 'chicken_razala',
-    32: 'chicken_tikka', 33: 'chicken_tikka_masala', 34: 'chikki', 35: 'chow_chow_bath', 36: 'coconut_chutney', 37: 'cup_cakes', 38: 'daal_baati_churma', 39: 'daal_puri', 40: 'dal_makhani', 41: 'dal_tadka', 42: 'dharwad_pedha', 43: 'donuts', 44: 'doodhpak', 45: 'dosa', 46: 'double_ka_meetha', 47: 'dum_aloo', 48: 'dumplings', 49: 'egg_bhurji', 50: 'egg_roll', 51: 'french_fries', 52: 'fried_rice', 53: 'gajar_ka_halva', 54: 'gavvalu', 55: 'ghever', 56: 'gobi_65', 57: 'gulab_jamun', 58: 'idly', 59: 'imarti', 60: 'jalebi', 61: 'kachori', 62: 'kadai_egg', 63: 'kadai_paneer', 64: 'kadhi_pakoda', 65: 'kajjikaya', 66: 'kaju_katli_kaju_barfi', 67: 'kakinada_khaja', 68: 'kalakand', 69: 'karela_bharta', 70: 'kathi roll', 71: 'kofta', 72: 'kuzhi_paniyaram', 73: 'lassi', 74: 'ledikeni', 75: 'litti_chokha',
-    76: 'lyangcha', 77: 'maach_jhol', 78: 'macarons', 79: 'makki_di_roti_sarson_da_saag', 80: 'malabar_parotta', 81: 'malapua', 82: 'mango_lassi', 83: 'masala_tea_chai', 84: 'meduvadai', 85: 'misi_roti', 86: 'misti_doi', 87: 'modak', 88: 'mysore_pak', 89: 'naan', 90: 'navrattan_korma', 91: 'noodles', 92: 'omelette', 93: 'palak_paneer', 94: 'pancake', 95: 'paneer_butter_masala', 96: 'phirni', 97: 'pizza', 98: 'poha', 99: 'poori', 100: 'poornalu', 101: 'pootharekulu', 102: 'qubani_ka_meetha', 103: 'rabri', 104: 'ragi_mudde_ragi_sankati', 105: 'ras_malai', 106: 'rasgulla', 107: 'samosa', 108: 'sandesh', 109: 'shankarpali', 110: 'sheer_korma', 111: 'sheera', 112: 'shrikhand', 113: 'sohan_halwa', 114: 'sohan_papdi', 115: 'stuffed_mirchi_miarpakaya_bajji', 116: 'sutar_feni', 117: 'tandoori_chicken', 118: 'tawa_paneer', 119: 'tiramisu', 120: 'unni_appam', 121: 'upma', 122: 'vada pav'
+indian_class_name = {
+    0: 'aloo methi', 1: 'anarsa', 2: 'apricot chutney', 3: 'bandar laddu', 4: 'biryani',
+    5: 'beet salad', 6: 'bombay sandwich', 7: 'brownie', 8: 'burger', 9: 'chak hao kheer',
+    10: 'chapati', 11: 'chicken razala', 12: 'chikki', 13: 'chocolate burfi', 14: 'chocolate cake',
+    15: 'chow chow bath', 16: 'corn soup', 17: 'croissant', 18: 'cup cakes', 19: 'daal baati churma',
+    20: 'daal puri', 21: 'dharwad pedha', 22: 'doodhpak', 23: 'dosa', 24: 'edamame',
+    25: 'french fries', 26: 'gajar ka halva', 27: 'garlic bread', 28: 'gobi 65', 29: 'gulab jamun',
+    30: 'kadhi pakoda', 31: 'kajjikaya', 32: 'kaju katli kaju barfi', 33: 'kathi roll', 34: 'kulfi',
+    35: 'lasagna', 36: 'lassi', 37: 'macarons', 38: 'makki di roti sarson da saag',
+    39: 'malabar parotta', 40: 'mango lassi', 41: 'meduvadai', 42: 'modak', 43: 'mysore pak',
+    44: 'noodles', 45: 'palak paneer', 46: 'paneer kulcha', 47: 'paneer pakora', 48: 'pathiri',
+    49: 'phirni', 50: 'pho', 51: 'poori', 52: 'poornalu', 53: 'pootharekulu',
+    54: 'qubani ka meetha', 55: 'ragi mudde ragi sankati', 56: 'rasgulla', 57: 'red velvet cake',
+    58: 'samosa', 59: 'shankarpali', 60: 'shawarma', 61: 'sheera', 62: 'sohan halwa',
+    63: 'sohan papdi', 64: 'sorpotel', 65: 'stuffed mirchi mirapakaya bajji', 66: 'sutar feni',
+    67: 'tandoori chicken', 68: 'vada pav', 69: 'waffles'
 }
+
+
 
 nonIndian_class_name = {
     1: 'apple_pie', 2: 'baby_back_ribs', 3: 'baklava', 4: 'beef_carpaccio', 5: 'beef_tartare', 6: 'beet_salad', 7: 'beignets', 8: 'bibimbap', 9: 'bread_pudding', 10: 'breakfast_burrito', 11: 'bruschetta', 12: 'caesar_salad', 13: 'cannoli', 14: 'caprese_salad', 15: 'carrot_cake', 16: 'ceviche', 17: 'cheese_plate', 18: 'cheesecake', 19: 'chicken_curry', 20: 'chicken_quesadilla', 21: 'chicken_wings', 22: 'chocolate_cake', 23: 'chocolate_mousse', 24: 'churros', 25: 'clam_chowder', 26: 'club_sandwich', 27: 'crab_cakes', 28: 'creme_brulee', 29: 'croque_madame', 30: 'cup_cakes', 31: 'deviled_eggs', 32: 'donuts', 33: 'dumplings', 34: 'edamame', 35: 'eggs_benedict', 36: 'falafel', 37: 'filet_mignon', 38: 'fish_and_chips', 39: 'foie_gras', 40: 'french_fries', 41: 'french_onion_soup', 
@@ -75,6 +89,10 @@ def load_inception_model():
     return model
 
 def load_indian_model():
+    # Define dataset and model parameters
+    n_classes =70 
+    img_width, img_height = 200, 200
+
     # Load and modify the InceptionV3 model as used during training
     inception = InceptionV3(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))
     layer = inception.output
@@ -89,7 +107,7 @@ def load_indian_model():
     model = Model(inputs=inception.input, outputs=predictions)
 
     # Load the best weights from the checkpoint (update the path if necessary)
-    model.load_weights('best_weights_122_Indian_attempt1class.weights.h5')
+    model.load_weights('best_weights_filtered70_attempt4.weights.h5')
 
     return model
 
@@ -520,7 +538,7 @@ def predict_and_scrape_indian():
         prediction = model.predict(processed_image)
         predicted_class = np.argmax(prediction, axis=-1)[0]
         predicted_label = indian_class_name.get(predicted_class, "Unknown class")
-        logger.info(f"Predicted label: {predicted_label}")
+        logger.info(f"Predicted label: {predicted_class}")
 
         # Perform web scraping using the predicted label
         recipe_url = search_recipe(predicted_label)
