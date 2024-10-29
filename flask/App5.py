@@ -33,7 +33,7 @@ class_names = {
 }
 
 indian_class_name = {
-    0: 'aloo methi', 1: 'anarsa', 2: 'apricot chutney', 3: 'bandar laddu', 4: 'biryani',
+    0: 'aloo methi', 1: 'anarsa', 2: 'apricot chutney', 3: 'laddu', 4: 'biryani',
     5: 'beet salad', 6: 'bombay sandwich', 7: 'brownie', 8: 'burger', 9: 'chak hao kheer',
     10: 'chapati', 11: 'chicken razala', 12: 'chikki', 13: 'chocolate burfi', 14: 'chocolate cake',
     15: 'chow chow bath', 16: 'corn soup', 17: 'croissant', 18: 'cup cakes', 19: 'daal baati churma',
@@ -588,7 +588,7 @@ def predict_and_scrape_indian():
 
 @app.route('/predict-non-indian-and-scrape', methods=['POST'])
 def predict_and_scrape_non_indian():
-    model = models['non_indian_food']
+    model = models['inception']
 
     if 'image' not in request.files:
         logger.warning("No image part in the request.")
@@ -617,7 +617,7 @@ def predict_and_scrape_non_indian():
         # Predict the class of the image
         prediction = model.predict(processed_image)
         predicted_class = np.argmax(prediction, axis=-1)[0]
-        predicted_label = nonIndian_class_name.get(predicted_class, "Unknown class")
+        predicted_label = class_names.get(predicted_class, "Unknown class")
         logger.info(f"Predicted label: {predicted_label}")
 
         # Perform web scraping using the predicted label
